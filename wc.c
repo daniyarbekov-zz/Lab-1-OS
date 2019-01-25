@@ -5,6 +5,8 @@
 #include "common.h"
 #include "wc.h"
 #include "sorted_points.h"
+#include <stdbool.h>
+#include <ctype.h>
 
 
 typedef struct node {
@@ -19,6 +21,13 @@ struct wc {
 };
 
 
+void wc_destroy(struct wc *wc);
+void wc_output(struct wc *wc);
+bool ifPresent (char* str, int index, struct wc *wc);
+unsigned long hashValue (char* str);
+
+
+int SIZE = 100000;
 
 struct wc *wc_init(char *word_array, long size)
 {
@@ -26,10 +35,12 @@ struct wc *wc_init(char *word_array, long size)
 
 	wc = (struct wc *)malloc(sizeof(struct wc));
 
-	long int SIZE = size/10;
+	SIZE = size/10;
 	
-	wc.hashMap = (struct node * ) malloc(SIZE * sizeof(struct node))
+	
 	assert(wc);
+
+	wc->hashMap = malloc(SIZE * sizeof(node*));
 
 	//string parsing 
 	char *parser = word_array;
@@ -46,7 +57,7 @@ struct wc *wc_init(char *word_array, long size)
 
 
 	while(endIndex <= size){
-		if(!isspace((int) *(parser + endIndex)) && endIndex != strlen(string)){
+		if(!isspace(((int) *(parser + endIndex)) && endIndex != size)){
 			endIndex++;
 		} else{
 			length = (int) endIndex - begIndex;
@@ -83,7 +94,7 @@ struct wc *wc_init(char *word_array, long size)
 
 void wc_output(struct wc *wc) {
 
-	for (int i = 0; i < 100000; i++) { // increment thru  hash table
+	for (int i = 0; i < SIZE; i++) { // increment thru  hash table
 
 		node *temp = wc->hashMap[i]; // temp always pointing to the dummy head
 		node *tempNext = temp->next;
@@ -94,18 +105,11 @@ void wc_output(struct wc *wc) {
 
 }
 
-
-
-
-	
-
-
+}
 
 
 void wc_destroy(struct wc *wc) {
-
-
-	for(int i = 0; i < 100000; i++){    //increment thru hash table	
+	for(int i = 0; i < SIZE; i++){    //increment thru hash table	
 	
 		node *temp = wc->hashMap[i]; // temp always pointing to the head
 		node *tempNext = temp->next;
@@ -129,8 +133,8 @@ void wc_destroy(struct wc *wc) {
 
 bool ifPresent (char* str, int index, struct wc *wc){
 	if(wc->hashMap[index] == NULL){
-		node *dummyHead = (struct node *)malloc(sizeof(struct node));
-		node *newNode = (struct node *)malloc(sizeof(struct(node)));
+		node *dummyHead = (node *)malloc(sizeof(node));
+		node *newNode = (node *)malloc(sizeof(node));
 
 		newNode->value = str;
 		newNode->key = index;
@@ -153,7 +157,7 @@ bool ifPresent (char* str, int index, struct wc *wc){
 			pointerNext = pointerNext->next;
 		}
 
-		node *pointerNext = (struct node *)malloc(sizeof(struct node));
+		pointerNext = (node *)malloc(sizeof(node));
 		pointerNext->value = str;
 		pointerNext->key = index;
 		pointerNext->count = 1;
@@ -169,10 +173,10 @@ bool ifPresent (char* str, int index, struct wc *wc){
 unsigned long hashValue (char* str){
 	//1000th prime value;
 	unsigned long hash = 5381;
-	int c;
 
-	while (*(str++)!= '\0'){
-		hash = ((hash<<5) + hash) + c;
+	while (*(str)!= '\0'){
+		hash = ((hash<<5) + hash) + *str;
+		str++;
 	}
 	return hash;
 }
