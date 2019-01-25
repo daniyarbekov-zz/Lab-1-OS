@@ -34,7 +34,6 @@ struct wc *wc_init(char *word_array, long size)
 	//string parsing 
 	char *parser = word_array;
 
-
 	long int begIndex = 0;
 	long int  endIndex = 0;
 	int length = 0;
@@ -69,18 +68,43 @@ struct wc *wc_init(char *word_array, long size)
 	return wc;
 }
 
+
+
 void
 wc_output(struct wc *wc)
 {
-	TBD();
+	
+	
 }
 
-void
-wc_destroy(struct wc *wc)
-{
-	TBD();
-	free(wc);
+
+
+void wc_destroy(struct wc *wc) {
+
+
+	for(int i=0; i<100000; i++){    //increment thru hash table	
+	
+		node *temp = wc->hashMap[i]; // temp always pointing to the head
+		node *tempNext = temp->next;
+		while (tempNext != NULL){
+			node *remove = tempNext; //define the node to be removed			
+			tempNext = tempNext->next;
+			free(remove);		
+		}
+
+        if(temp!=NULL){
+            free(temp);
+        }
+
+	}
+   
+	free(wc->hashMap);
 }
+
+
+
+
+
 
 
 
