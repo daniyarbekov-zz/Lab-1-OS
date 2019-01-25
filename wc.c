@@ -7,8 +7,6 @@
 #include "sorted_points.h"
 
 
-#define SIZE 100000
-
 typedef struct node {
 	char *value;
 	int key;
@@ -27,6 +25,8 @@ struct wc *wc_init(char *word_array, long size)
 	struct wc *wc;
 
 	wc = (struct wc *)malloc(sizeof(struct wc));
+
+	long int SIZE = size/10;
 	
 	wc.hashMap = (struct node * ) malloc(SIZE * sizeof(struct node))
 	assert(wc);
