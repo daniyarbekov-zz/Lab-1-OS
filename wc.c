@@ -70,19 +70,31 @@ struct wc *wc_init(char *word_array, long size)
 
 
 
-void
-wc_output(struct wc *wc)
-{
-	
-	
+void wc_output(struct wc *wc) {
+
+	for (int i = 0; i < 100000; i++) { // increment thru  hash table
+
+		node *temp = wc->hashMap[i]; // temp always pointing to the dummy head
+		node *tempNext = temp->next;
+		
+		while (tempNext != NULL){ 
+			printf("%s:%i\n", tempNext->value, tempNext->count);
+		}
+
 }
+
+
+
+
+	
+
 
 
 
 void wc_destroy(struct wc *wc) {
 
 
-	for(int i=0; i<100000; i++){    //increment thru hash table	
+	for(int i = 0; i < 100000; i++){    //increment thru hash table	
 	
 		node *temp = wc->hashMap[i]; // temp always pointing to the head
 		node *tempNext = temp->next;
