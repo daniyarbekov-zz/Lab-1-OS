@@ -36,17 +36,26 @@ struct wc *wc_init(char *word_array, long size)
 	wc = (struct wc *)malloc(sizeof(struct wc));
 
 	SIZE = size/10;
-	
+
+	printf("The string is : %s\n",word_array);
+	printf("The length of string is %ld\n", size);
 	
 	assert(wc);
 
 	wc->hashMap = malloc(SIZE * sizeof(node*));
+	printf("%d\n",SIZE);
+
+	for(int i = 0; i < SIZE; i++){
+		wc->hashMap[i] = NULL;
+		//printf("%d",i);
+	}
 
 	//string parsing 
 	char *parser = word_array;
 
 
-	long int begIndex, endIndex = 0;
+	long int begIndex =0;
+	long int endIndex = 0;
 	unsigned long hV = 0;
 
 	char* word;
@@ -56,28 +65,31 @@ struct wc *wc_init(char *word_array, long size)
 
 
 
+
 	while(endIndex <= size){
-		if(!isspace(((int) *(parser + endIndex)) && endIndex != size)){
+		if(!isspace((int) *(parser + endIndex)) && endIndex != size){
 			endIndex++;
+			
 		} else{
 			length = (int) endIndex - begIndex;
+
 			if(length > 0){
 				word = (char*) malloc((length+1)*sizeof(char));
                 count = 0;
 				while(count<length){
 					word[count] = *(parser+begIndex);
+					
 					begIndex++;
                     count++;
 				}
 				word[count] = '\0';
-				printf("%s",word);
+				
 				hV = hashValue(word);
 				index = hV % SIZE;
+				printf("The word is %s, its hash value is %ld, its length is %d and its index is %d\n",word,hV, length,index);
 				if(ifPresent(word,index,wc)){
 					free(word);
 				}
-				
-				printf(" hash value is: %ld and index is: %d", hV,index);
 				endIndex++;
 				begIndex = endIndex;
 			} else{
@@ -93,37 +105,67 @@ struct wc *wc_init(char *word_array, long size)
 
 
 void wc_output(struct wc *wc) {
+	node *temp;
+	node *tempNext;
+
+	if(wc == NULL){
+		return;
+	}
+
+	printf("OUTPUT IS INITIALIZED\n");
 
 	for (int i = 0; i < SIZE; i++) { // increment thru  hash table
-
-		node *temp = wc->hashMap[i]; // temp always pointing to the dummy head
-		node *tempNext = temp->next;
 		
-		while (tempNext != NULL){ 
-			printf("%s:%i\n", tempNext->value, tempNext->count);
+		temp = wc->hashMap[i]; // temp always pointing to the NULL or dummy head
+		if(temp != NULL){
+			tempNext = temp->next;
+		
+			while (tempNext != NULL){ 
+				printf("%s:%i\n", tempNext->value, tempNext->count);
+				tempNext  = tempNext->next;
+			}
 		}
 
-}
+	}
+	printf("OUTPUT IS COMPLETE\n");
 
 }
 
 
 void wc_destroy(struct wc *wc) {
-	for(int i = 0; i < SIZE; i++){    //increment thru hash table	
-	
-		node *temp = wc->hashMap[i]; // temp always pointing to the head
-		node *tempNext = temp->next;
-		while (tempNext != NULL){
-			node *remove = tempNext; //define the node to be removed			
-			tempNext = tempNext->next;
-			free(remove);		
-		}
+	node *remove;
+	node *temp;
+	node *tempNext;
 
-        if(temp!=NULL){
-            free(temp);
-        }
-
+	if(wc == NULL){
+		return;
 	}
+
+	printf("NODE INITIALIZED DESTRUCTION\n");
+
+	for(int i = 0; i < SIZE; i++){    //increment thru hash table	
+		temp = wc->hashMap[i];
+
+		if(temp != NULL){
+			tempNext = temp->next;
+			
+			printf("NODE IS NOT NULL AND THE INDEX IS %d\n", i);
+
+			while (tempNext != NULL){
+				remove = tempNext; //define the node to be removed			
+				tempNext = tempNext->next;
+				printf("Removing node is: %s\n", remove->value);
+				free(remove->value);
+				free(remove);		
+			}
+
+			free(temp);
+		} else{
+			printf("NODE IS NULLLL!\n");
+		}
+	}
+
+	printf("DESTRUCTION IS COMPLETE");
    
 	free(wc->hashMap);
 }
@@ -132,25 +174,31 @@ void wc_destroy(struct wc *wc) {
 
 
 bool ifPresent (char* str, int index, struct wc *wc){
+
 	if(wc->hashMap[index] == NULL){
+		printf("NODE HASNT BEEN INTIALIZED: %s\n", str);
+
 		node *dummyHead = (node *)malloc(sizeof(node));
 		node *newNode = (node *)malloc(sizeof(node));
-
 		newNode->value = str;
 		newNode->key = index;
 		newNode->count = 1;
 		newNode->next = NULL;
+		printf("NODE INITIALIZED TEST: %s\n", newNode->value);
 		wc->hashMap[index] = dummyHead;
 		dummyHead->next = newNode;
-
+		printf("NODE IS SET:%s \n",wc->hashMap[index]->next->value);
 		return false;
 	}
 	else{
+		printf("HASHED INTO SAME SLOT\n");
 		node* pointer = wc->hashMap[index];
 		node *pointerNext = pointer->next;
 		while(pointerNext!= NULL){
 			if(strcmp(pointerNext->value, str) == 0){
+				printf("DUPLICATE\n");
 				pointerNext->count+=1;
+				printf("INCREASE COUNTER: %d\n",pointerNext->count);
 				return true;
 			}
 			pointer = pointerNext;
@@ -163,6 +211,8 @@ bool ifPresent (char* str, int index, struct wc *wc){
 		pointerNext->count = 1;
 		pointerNext->next = NULL;
 		pointer->next = pointerNext;
+		printf("POINTER BEFORE: %s\n",pointer->value);
+		printf("APPEND TO END: %s\n",pointerNext->value);
 		return false;
 	}
 
@@ -180,7 +230,6 @@ unsigned long hashValue (char* str){
 	}
 	return hash;
 }
-
 
 
 
